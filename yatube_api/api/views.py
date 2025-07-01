@@ -1,18 +1,13 @@
 from rest_framework import permissions, viewsets
 from rest_framework.generics import get_object_or_404
 
+from api.permissions import IsAuthorOrReadOnly
 from api.serializers import CommentSerializer, GroupSerializer, PostSerializer
 from posts.models import Group, Post
 
 
-class IsAuthorOrReadOnly(permissions.BasePermission):
-
-    def has_object_permission(self, request, view, obj):
-        return ((request.method == 'GET') or (obj.author == request.user))
-
-
 class PostViewSet(viewsets.ModelViewSet):
-    permission_classes = [permissions.IsAuthenticated & IsAuthorOrReadOnly]
+    permission_classes = [permissions.IsAuthenticated, IsAuthorOrReadOnly]
     queryset = Post.objects.all()
     serializer_class = PostSerializer
 
@@ -21,7 +16,7 @@ class PostViewSet(viewsets.ModelViewSet):
 
 
 class CommentViewSet(viewsets.ModelViewSet):
-    permission_classes = [permissions.IsAuthenticated & IsAuthorOrReadOnly]
+    permission_classes = [permissions.IsAuthenticated, IsAuthorOrReadOnly]
     serializer_class = CommentSerializer
 
     def get_post(self):
